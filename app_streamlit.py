@@ -40,13 +40,29 @@ st.divider()
 def load_model():
     predictor = TMDBRevenuePredictor()
     if os.path.exists('revenue_model.pkl') and os.path.exists('scaler.pkl'):
-        predictor.load()
-        return predictor, True
+        try:
+            predictor.load()
+            return predictor, True
+        except Exception as e:
+            st.error(f"Erreur lors du chargement des fichiers .pkl: {e}")
+            raise
     else:
-        st.warning("⚠️ Modèle non trouvé. Entraînement du modèle...")
-        predictor.train()
-        predictor.save()
-        return predictor, False
+        # Sur Streamlit Cloud, les fichiers .pkl n'existent pas
+        if 'streamlit' in os.environ.get('PATH', '').lower() or 'streamlit' in os.getcwd().lower():
+            st.error("❌ Les fichiers du modèle ne sont pas disponibles sur Streamlit Cloud")
+            st.info("💡 Solution: Les fichiers revenue_model.pkl et scaler.pkl doivent être committés dans le repo GitHub")
+            st.stop()
+        
+        # En local, entraîner le modèle
+        try:
+            st.warning("⚠️ Modèle non trouvé. Entraînement du modèle...")
+            predictor.train()
+            predictor.save()
+            return predictor, False
+        except FileNotFoundError:
+            st.error("❌ Le fichier tmdb_5000_movies.csv est introuvable!")
+            st.info("💡 Assurez-vous que le fichier CSV est dans le même répertoire")
+            st.stop()
 
 try:
     predictor, model_loaded = load_model()
