@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMDB Revenue Predictor - Prédiction des Revenus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .info-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result-label {
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .result-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            word-break: break-all;
+        }
+        
+        .error {
+            background: #fee;
+            border-left-color: #f44;
+            color: #c33;
+        }
+        
+        .success {
+            background: #efe;
+            border-left-color: #4f4;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #e0e0e0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 22px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 TMDB Revenue Predictor</h1>
+            <p class="subtitle">Prédisez les revenus d'un film avec IA</p>
+        </header>
+        
+        <form id="predictionForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="budget">Budget ($)</label>
+                    <input type="number" id="budget" name="budget" 
+                           placeholder="Ex: 100000000" value="50000000" min="1000000" required>
+                    <p class="info-text">Min: $1M | Recommandé: $50M-200M</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="popularity">Popularité (0-100)</label>
+                    <input type="number" id="popularity" name="popularity" 
+                           min="0" max="100" placeholder="Ex: 50" value="50" required>
+                    <p class="info-text">Score TMDB</p>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="runtime">Durée (minutes)</label>
+                    <input type="number" id="runtime" name="runtime" 
+                           min="60" max="300" placeholder="Ex: 120" value="120" required>
+                    <p class="info-text">En minutes</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="vote_average">Note Moyenne (0-10)</label>
+                    <input type="number" id="vote_average" name="vote_average" 
+                           min="0" max="10" step="0.1" placeholder="Ex: 7.5" value="7.5" required>
+                    <p class="info-text">Note IMDB/TMDB</p>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="vote_count">Nombre de Votes</label>
+                <input type="number" id="vote_count" name="vote_count" 
+                       placeholder="Ex: 10000" value="10000" required>
+                <p class="info-text">Nombre total de votes</p>
+            </div>
+            
+            <button type="submit">🚀 Prédire le Revenue</button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <span class="spinner"></span>Calcul en cours...
+        </div>
+        
+        <div class="result" id="result"></div>
+    </div>
+    
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const budget = parseFloat(document.getElementById('budget').value);
+            const popularity = parseFloat(document.getElementById('popularity').value);
+            const runtime = parseFloat(document.getElementById('runtime').value);
+            const vote_average = parseFloat(document.getElementById('vote_average').value);
+            const vote_count = parseFloat(document.getElementById('vote_count').value);
+            
+            // Validation: Budget doit être minimum $1M
+            if (budget < 1_000_000) {
+                const result = document.getElementById('result');
+                result.innerHTML = `
+                    <strong>⚠️ Budget invalide!</strong><br>
+                    Le budget doit être au minimum $1,000,000 (1 million).<br>
+                    <small>Les films avec un budget inférieur à $1M ne sont pas représentés dans le modèle.</small>
+                `;
+                result.classList.add('show', 'error');
+                return;
+            }
+            
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            
+            loading.style.display = 'flex';
+            result.classList.remove('show');
+            
+            try {
+                // Appel à l'API
+                const response = await fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        budget, popularity, runtime, vote_average, vote_count
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erreur API');
+                }
+                
+                const data = await response.json();
+                
+                loading.style.display = 'none';
+                result.innerHTML = `
+                    <div class="result-label">💰 Revenue Prédit:</div>
+                    <div class="result-value">${data.predicted_revenue_formatted}</div>
+                    <div style="margin-top: 15px; font-size: 13px; color: #666;">
+                        <strong>Paramètres:</strong><br>
+                        Budget: $${budget.toLocaleString()}<br>
+                        Popularité: ${popularity}/100<br>
+                        Durée: ${runtime} min<br>
+                        Note: ${vote_average}/10<br>
+                        Votes: ${vote_count.toLocaleString()}
+                    </div>
+                `;
+                result.classList.add('show', 'success');
+                
+            } catch (error) {
+                loading.style.display = 'none';
+                result.innerHTML = `
+                    <strong>⚠️ Erreur:</strong> ${error.message}<br>
+                    <small>Assurez-vous que le serveur API est en cours d'exécution</small>
+                `;
+                result.classList.add('show', 'error');
+            }
+        });
+        
+        // Exemples prédéfinis
+        function setExample(name, budget, popularity, runtime, vote_avg, votes) {
+            document.getElementById('budget').value = budget;
+            document.getElementById('popularity').value = popularity;
+            document.getElementById('runtime').value = runtime;
+            document.getElementById('vote_average').value = vote_avg;
+            document.getElementById('vote_count').value = votes;
+        }
+    </script>
+</body>
+</html>
