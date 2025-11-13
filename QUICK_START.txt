@@ -1,0 +1,81 @@
+🔗 GITHUB DEPLOYMENT - COPY/PASTE COMMANDS
+
+Suivez ces étapes EXACTEMENT:
+
+═══════════════════════════════════════════════════════════════
+
+ÉTAPE 1: Créer un repo GitHub
+───────────────────────────────
+1. Allez sur https://github.com/new
+2. Repository name: tmdb-revenue-predictor
+3. Description: Machine Learning app to predict movie revenues
+4. Select: Public
+5. Cliquez "Create repository"
+
+═══════════════════════════════════════════════════════════════
+
+ÉTAPE 2: Exécutez ces commandes PowerShell (dans votre terminal)
+───────────────────────────────────────────────────────────────
+
+COPIE/COLLE CETTE COMMANDE (remplacez VOTRE_USERNAME):
+
+cd "c:\Users\MedRa\OneDrive\Bureau\2éme ingénierie\ML\Prediction"
+git remote add origin https://github.com/VOTRE_USERNAME/tmdb-revenue-predictor.git
+git branch -M main
+git push -u origin main
+
+⚠️ IMPORTANT: Remplacez VOTRE_USERNAME par votre pseudo GitHub!
+
+Exemple:
+git remote add origin https://github.com/medra99/tmdb-revenue-predictor.git
+
+═══════════════════════════════════════════════════════════════
+
+ÉTAPE 3: Déployer sur Streamlit Cloud
+──────────────────────────────────────
+1. Allez sur https://share.streamlit.io
+2. Cliquez "New app"
+3. Repository: [VOTRE_USERNAME]/tmdb-revenue-predictor
+4. Branch: main
+5. File: app_streamlit.py
+6. Cliquez "Deploy"
+
+✨ Attendre 2-3 minutes...
+
+Votre app sera accessible sur:
+https://[VOTRE_USERNAME]-tmdb-revenue-predictor.streamlit.app
+
+═══════════════════════════════════════════════════════════════
+
+ÉTAPE 4: Modifications futures
+──────────────────────────────
+
+À chaque fois que vous modifiez le code:
+
+cd "c:\Users\MedRa\OneDrive\Bureau\2éme ingénierie\ML\Prediction"
+git add .
+git commit -m "Description du changement"
+git push
+
+✅ Streamlit redéploiera AUTOMATIQUEMENT!
+
+═══════════════════════════════════════════════════════════════
+
+TROUBLESHOOTING:
+
+❌ "fatal: Could not read from remote repository"
+   → Vérifiez que VOTRE_USERNAME est correct
+   → Assurez-vous d'être connecté à GitHub
+
+❌ "Error: Repository not found"
+   → Vérifiez le nom du repo sur GitHub
+   → Assurez-vous qu'il est PUBLIC
+
+❌ Streamlit deploy échoue
+   → Vérifiez requirements.txt
+   → Assurez-vous que app_streamlit.py existe
+   → Consultez les logs Streamlit
+
+═══════════════════════════════════════════════════════════════
+
+✅ C'EST TOUT! Votre app est maintenant en ligne et accessible 24/7!
